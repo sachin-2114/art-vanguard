@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
+<title>Space Shooting Game</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
+  * {
+    box-sizing: border-box;
+  }
+  body, html {
+    margin: 0; padding: 0;
+    background: radial-gradient(ellipse at center, #000014 0%, #000000 80%);
+    color: #0ff;
+    font-family: 'Orbitron', monospace, sans-serif;
+    overflow: hidden;
+    height: 600px;
+    max-width: 350px;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  h1 {
+    margin: 10px 0 0 0;
+    font-weight: 500;
+    font-size: 1.8rem;
+    color: #00ffffcc;
+    text-shadow: 0 0 8px #00ffffaa;
+  }
+  #gameContainer {
+    position: relative;
+    width: 350px;
+    height: 600px;
+    border: 2px solid #00ffffaa;
+    background: #000011;
+    box-shadow: 0 0 30px #00ffff88 inset;
+    border-radius: 8px;
+    user-select: none;
+  }
+  canvas {
+    display: block;
+    background: linear-gradient(to top, #001020, #001a40);
+    border-radius: 8px;
+  }
+  #scoreBoard {
+    position: absolute;
+    top: 8px;
+    left: 10px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #00ffffee;
+    text-shadow: 0 0 6px #00ffffbb;
+    user-select: none;
+  }
+  #gameOverScreen {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0; left: 0;
+    background: rgba(0,0,0,0.85);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #00ffffcc;
+    font-size: 1.4rem;
+    font-weight: 700;
+    text-align: center;
+    border-radius: 8px;
+    z-index: 10;
+    visibility: hidden;
+  }
+  #gameOverScreen button {
+    margin-top: 20px;
+    background: #00ffff55;
+    border: 2px solid #00ffffaa;
+    color: #00ffffdd;
+    font-family: 'Orbitron', monospace, sans-serif;
+    font-size: 1.2rem;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  #gameOverScreen button:hover {
+    background: #00ffffcc;
+    color: #001a40;
+  }
+  /* Mobile controls */
+  #mobileControls {
+    position: absolute;
+    bottom: 10px;
+    width: 100%;
+    padding: 0 10px;
+    display: flex;
+    justify-content: space-between;
+    pointer-events: auto;
+    user-select: none;
+  }
+  .btnControl {
+    background: #00ffff33;
+    border: 2px solid #00ffffaa;
+    color: #00ffffee;
+    font-family: 'Orbitron', monospace, sans-serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    width: 60px;
+    height: 60px;
+    border-radius: 10px;
+    text-align: center;
+    line-height: 54px;
+    box-shadow: 0 0 12px #00ffff66;
+    user-select: none;
+    touch-action: manipulation;
+    transition: background-color 0.2s ease;
+  }
+  .btnControl:active {
+    background: #00ffffcc;
+    color: #001a40;
+  }
+  #btnShoot {
+    position: absolute;
+    right: 10px;
+    bottom: 80px;
+    width: 80px;
+    height: 80px;
+    font-size: 2.2rem;
+    line-height: 72px;
+    border-radius: 50%;
+    box-shadow: 0 0 18px #00ffffbb;
+    border-color: #00ffffee;
+    background: #00ffff44;
+  }
+</style>
+</head>
+<body>
+<h1>Space Shooter</h1>
+<div id="gameContainer" role="main" aria-label="Space shooting game">
+  <canvas id="gameCanvas" width="350" height="600" tabindex="0"></canvas>
+  <div id="scoreBoard" aria-live="polite" aria-atomic="true">Score: 0</div>
+  <div id="gameOverScreen" role="alertdialog" aria-modal="true" aria-hidden="true">
+    <div id="gameOverMessage">Game Over<br>Your score: 0</div>
+    <button id="btnRestart" aria-label="Restart game">Restart</button>
+  </div>
+  <div id="mobileControls" aria-label="Game controls for mobile devices">
+    <div id="btnLeft" class="btnControl" aria-label="Move left">&#9664;</div>
+    <div id="btnRight" class="btnControl" aria-label="Move right">&#9654;</div>
+  </div>
+  <div id="btnShoot" class="btnControl" aria-label="Shoot">&#x25B2;</div>
+</div>
+
+<script>
+(() => {
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
+  const scoreBoard = document.getElementById('scoreBoard');
+  const gameOverScreen = document.getElementById('gameOverScreen');
+  const gameOverMessage = document.getElementById('gameOverMessage');
+  const btnRestart = document.getElementById('btnRestart');
+  const btnLeft = document.getElementById('btnLeft');
+  const btnRight = document.getElementById('btnRight');
+  const btnShoot = document.getElementById('btnShoot');
+
+  let animationId;
+  let keysPressed = {};
+
+  const GAME_WIDTH = 350;
+  const GAME_HEIGHT = 600;
+
+  // Player config
+  const playerWidth = 40;
+  const playerHeight = 30;
+  const playerSpeed = 6;
+  const bulletSpeed = 8;
+  const enemySpeedStart = 1.2;
+  const enemyBulletSpeed = 4;
+  const enemyRows = 3;
+  const enemyCols = 7;
+  const enemySpacingX = 12;
+  const enemySpacingY = 18;
+  const enemyWidth = 28;
+  const enemyHeight = 20;
+  const shootingIntervalMin = 1000; // ms
+  const shootingIntervalMax = 3000; // ms
+
+  let score = 0;
+  let gameOver = false;
+
+  // Game Objects
+  class Player {
+    constructor() {
+      this.width = playerWidth;
+      this.height = playerHeight;
+      this.x = (GAME_WIDTH - this.width)/2;
+      this.y = GAME_HEIGHT - this.height - 12;
+      this.color = '#00ffff';
+      this.cooldown = 0;
+      this.lives = 3;
+    }
+    draw() {
+      ctx.fillStyle = this.color;
+      // Draw a spaceship shape
+      ctx.beginPath();
+      ctx.moveTo(this.x + this.width/2, this.y);
+      ctx.lineTo(this.x + this.width, this.y + this.height);
+      ctx.lineTo(this.x, this.y + this.height);
+      ctx.closePath();
+      ctx.fill();
+      // Cockpit highlight
+      ctx.fillStyle = '#00ffffcc';
+      ctx.beginPath();
+      ctx.moveTo(this.x + this.width/2, this.y + 5);
+      ctx.lineTo(this.x + this.width*0.65, this.y + this.height*0.7);
+      ctx.lineTo(this.x + this.width*0.35, this.y + this.height*0.7);
+      ctx.closePath();
+      ctx.fill();
+    }
+    move(direction) {
+      if(direction === 'left') {
+        this.x -= playerSpeed;
+        if(this.x < 0) this.x = 0;
+      } else if(direction === 'right') {
+        this.x += playerSpeed;
+        if(this.x + this.width > GAME_WIDTH) this.x = GAME_WIDTH - this.width;
+      }
+    }
+    updateCooldown() {
+      if(this.cooldown > 0) this.cooldown--;
+    }
+  }
+
+  class Bullet {
+    constructor(x, y, speed, color, isEnemy=false) {
+      this.x = x;
+      this.y = y;
+      this.speed = speed;
+      this.radius = 4;
+      this.color = color;
+      this.isEnemy = isEnemy;
+      this.active = true;
+    }
+    draw() {
+      ctx.fillStyle = this.color;
+      ctx.beginPath();
+      ctx.ellipse(this.x, this.y, this.radius, this.radius*1.6, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    update() {
+      this.y += this.speed;
+      if(this.y < 0 || this.y > GAME_HEIGHT) this.active = false;
+    }
+  }
+
+  class Enemy {
+    constructor(x, y) {
+      this.x = x;
+      this.y = y;
+      this.width = enemyWidth;
+      this.height = enemyHeight;
+      this.color = '#00ccff';
+      this.isAlive = true;
+    }
+    draw() {
+      if(!this.isAlive) return;
+      // Draw a futuristic alien ship shape
+      ctx.fillStyle = this.color;
+      ctx.beginPath();
+      ctx.moveTo(this.x + this.width/2, this.y);
+      ctx.lineTo(this.x + this.width*0.85, this.y + this.height*0.35);
+      ctx.lineTo(this.x + this.width*0.7, this.y + this.height);
+      ctx.lineTo(this.x + this.width*0.3, this.y + this.height);
+      ctx.lineTo(this.x + this.width*0.15, this.y + this.height*0.35);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = '#00ffffaa';
+      ctx.beginPath();
+      ctx.ellipse(this.x + this.width/2, this.y + this.height*0.4, this.width*0.2, this.height*0.15, 0, 0, Math.PI*2);
+      ctx.fill();
+    }
+  }
+
+  // Game entities
+  let player;
+  let bullets;
+  let enemyBullets;
+  let enemies;
+  let enemyDirection; // 1 right, -1 left
+  let enemySpeed;
+  let enemyMoveDown = 12;
+  let enemyShootTimer;
+
+  function resetGame() {
+    score = 0;
+    gameOver = false;
+    player = new Player();
+    bullets = [];
+    enemyBullets = [];
+    enemies = [];
+    enemyDirection = 1;
+    enemySpeed = enemySpeedStart;
+    enemyShootTimer = Date.now() + getRandomInt(shootingIntervalMin, shootingIntervalMax);
+
+    // Create enemy grid
+    const startX = (GAME_WIDTH - ((enemyWidth + enemySpacingX) * enemyCols) + enemySpacingX) / 2;
+    const startY = 40;
+    for(let row=0; row<enemyRows; row++) {
+      for(let col=0; col<enemyCols; col++) {
+        let ex = startX + col * (enemyWidth + enemySpacingX);
+        let ey = startY + row * (enemyHeight + enemySpacingY);
+        enemies.push(new Enemy(ex, ey));
+      }
+    }
+    updateScore();
+    gameOverScreen.style.visibility = 'hidden';
+    gameOverScreen.setAttribute('aria-hidden', 'true');
+    canvas.focus();
+  }
+
+  function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max-min+1)) + min;
+  }
+
+  // Input Handling
+  function setupInput() {
+    window.addEventListener('keydown', e => {
+      if(gameOver) return;
+      if(e.code === 'ArrowLeft' || e.key === 'ArrowLeft') keysPressed.left = true;
+      else if(e.code === 'ArrowRight' || e.key === 'ArrowRight') keysPressed.right = true;
+      else if(e.code === 'Space' || e.key === ' ') keysPressed.shoot = true;
+    });
+    window.addEventListener('keyup', e => {
+      if(e.code === 'ArrowLeft' || e.key === 'ArrowLeft') keysPressed.left = false;
+      else if(e.code === 'ArrowRight' || e.key === 'ArrowRight') keysPressed.right = false;
+      else if(e.code === 'Space' || e.key === ' ') keysPressed.shoot = false;
+    });
+    // Mobile controls buttons
+    btnLeft.addEventListener('touchstart', e => { e.preventDefault(); if(!gameOver) keysPressed.left = true; });
+    btnLeft.addEventListener('touchend', e => { e.preventDefault(); keysPressed.left = false; });
+    btnRight.addEventListener('touchstart', e => { e.preventDefault(); if(!gameOver) keysPressed.right = true; });
+    btnRight.addEventListener('touchend', e => { e.preventDefault(); keysPressed.right = false; });
+    btnShoot.addEventListener('touchstart', e => { e.preventDefault(); if(!gameOver) keysPressed.shoot = true; });
+    btnShoot.addEventListener('touchend', e => { e.preventDefault(); keysPressed.shoot = false; });
+  }
+
+  // Collision detection helper
+  function isColliding(a, b) {
+    return !(
+      a.x > b.x + b.width ||
+      a.x + a.width < b.x ||
+      a.y > b.y + b.height ||
+      a.y + a.height < b.y
+    );
+  }
+  function bulletCollidesRect(bullet, rect) {
+    return (
+      bullet.x > rect.x &&
+      bullet.x < rect.x + rect.width &&
+      bullet.y > rect.y &&
+      bullet.y < rect.y + rect.height
+    );
+  }
+  function bulletHitsPlayer(bullet) {
+    return (
+      bullet.x > player.x &&
+      bullet.x < player.x + player.width &&
+      bullet.y > player.y &&
+      bullet.y < player.y + player.height
+    );
+  }
+
+  function updateScore() {
+    scoreBoard.textContent = 'Score: ' + score;
+  }
+
+  function gameOverHandler() {
+    gameOver = true;
+    gameOverMessage.innerHTML = `Game Over<br>Your score: ${score}`;
+    gameOverScreen.style.visibility = 'visible';
+    gameOverScreen.setAttribute('aria-hidden', 'false');
+  }
+
+  function shootBullet() {
+    if(player.cooldown === 0) {
+      // Shoot bullet from center top of player
+      bullets.push(new Bullet(player.x + player.width/2, player.y, -bulletSpeed, '#00ffff'));
+      player.cooldown = 16; // about 250ms at 60fps
+    }
+  }
+
+  function enemyShoot() {
+    if(enemies.length === 0) return;
+    // Select random enemy alive
+    const aliveEnemies = enemies.filter(e => e.isAlive);
+    if(aliveEnemies.length === 0) return;
+    const shooter = aliveEnemies[getRandomInt(0, aliveEnemies.length - 1)];
+    // Shoot bullet from enemy center bottom
+    enemyBullets.push(new Bullet(shooter.x + shooter.width/2, shooter.y + shooter.height, enemyBulletSpeed, '#ff3300', true));
+  }
+
+  function update(deltaTime) {
+    if(gameOver) return;
+
+    // Move player
+    if(keysPressed.left) player.move('left');
+    if(keysPressed.right) player.move('right');
+    player.updateCooldown();
+
+    // Player shoot
+    if(keysPressed.shoot) shootBullet();
+
+    // Update bullets and remove inactive
+    bullets.forEach(b => b.update());
+    bullets = bullets.filter(b => b.active);
+
+    enemyBullets.forEach(b => b.update());
+    enemyBullets = enemyBullets.filter(b => b.active);
+
+    // Move enemies horizontal
+    let rightMost = -Infinity;
+    let leftMost = Infinity;
+    enemies.forEach(e => {
+      if(e.isAlive) {
+        if(e.x + e.width > rightMost) rightMost = e.x + e.width;
+        if(e.x < leftMost) leftMost = e.x;
+      }
+    });
+
+    // Change direction if any enemy reaches edge
+    if(rightMost >= GAME_WIDTH - 10 && enemyDirection > 0) {
+      enemyDirection = -1;
+      enemies.forEach(e => {
+        if(e.isAlive) e.y += enemyMoveDown;
+      });
+    } else if(leftMost <= 10 && enemyDirection < 0) {
+      enemyDirection = 1;
+      enemies.forEach(e => {
+        if(e.isAlive) e.y += enemyMoveDown;
+      });
+    }
+    enemies.forEach(e => {
+      if(e.isAlive) e.x += enemyDirection * enemySpeed;
+    });
+
+    // Collision detection between player bullets and enemies
+    bullets.forEach(b => {
+      enemies.forEach(e => {
+        if(e.isAlive && bulletCollidesRect(b, e)) {
+          e.isAlive = false;
+          b.active = false;
+          score += 10;
+          updateScore();
+        }
+      });
+    });
+
+    // Collision detection between enemy bullets and player
+    enemyBullets.forEach(b => {
+      if(b.active && bulletHitsPlayer(b)) {
+        b.active = false;
+        gameOverHandler();
+      }
+    });
+
+    // Check enemies reaching player level (game over)
+    let playerYThreshold = player.y + player.height;
+    for(const e of enemies) {
+      if(e.isAlive && e.y + e.height >= playerYThreshold) {
+        gameOverHandler();
+        break;
+      }
+    }
+
+    // Check for win (all enemies dead)
+    if(enemies.every(e => !e.isAlive)) {
+      // Reset enemies with increased speed after a short delay
+      enemySpeed += 0.4;
+      resetGame();
+    }
+
+    // Enemy shooting periodically
+    if(Date.now() > enemyShootTimer) {
+      enemyShoot();
+      enemyShootTimer = Date.now() + getRandomInt(shootingIntervalMin, shootingIntervalMax);
+    }
+  }
+
+  // Drawing everything
+  function draw() {
+    // Clear canvas
+    ctx.clearRect(0,0,GAME_WIDTH,GAME_HEIGHT);
+
+    // Draw player
+    player.draw();
+
+    // Draw bullets
+    bullets.forEach(b => b.draw());
+    enemyBullets.forEach(b => b.draw());
+
+    // Draw enemies
+    enemies.forEach(e => e.draw());
+  }
+
+  // Main loop using requestAnimationFrame
+  let lastTime = 0;
+  function gameLoop(timestamp=0) {
+    let deltaTime = timestamp - lastTime;
+    lastTime = timestamp;
+    update(deltaTime);
+    draw();
+    if(!gameOver) animationId = requestAnimationFrame(gameLoop);
+  }
+
+  // Restart game button handler
+  btnRestart.addEventListener('click', () => {
+    resetGame();
+    animationId = requestAnimationFrame(gameLoop);
+  });
+
+  // Initial setup
+  resetGame();
+  setupInput();
+  animationId = requestAnimationFrame(gameLoop);
+
+})();
+</script>
+</body>
+</html>
+
