@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Art Vanguard | Premium Traditional Art Frames</title>
+    
+    <meta name="google-site-verification" content=" https://sachin-2114.github.io/my-first-website/" />
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #fdfbf7;
+            color: #2c2c2c;
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: #ffffff;
+            padding: 20px 10%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 3px solid #b3822a;
+        }
+
+        .logo {
+            font-size: 26px;
+            font-weight: bold;
+            color: #111;
+            letter-spacing: 2px;
+        }
+
+        .logo span {
+            color: #b3822a;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #555;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: #b3822a;
+        }
+
+        .social-icon {
+            font-size: 22px;
+            color: #555;
+            transition: color 0.3s;
+        }
+
+        .social-icon:hover {
+            color: #b3822a;
+        }
+
+        .hero {
+            background: linear-gradient(rgba(253, 251, 247, 0.88), rgba(253, 251, 247, 0.88)), 
+                        url('https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?q=80&w=1200') no-repeat center center/cover;
+            height: 70vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: #111;
+            font-family: 'Georgia', serif;
+        }
+
+        .hero p {
+            font-size: 19px;
+            color: #444;
+            max-width: 700px;
+            margin-bottom: 35px;
+        }
+
+        .btn {
+            background-color: #b3822a;
+            color: #fff;
+            padding: 15px 40px;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 4px;
+            transition: all 0.3s;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            background-color: #8c621e;
+            transform: translateY(-2px);
+        }
+
+        .gallery-container {
+            padding: 80px 10%;
+            text-align: center;
+        }
+
+        .gallery-container h2 {
+            font-size: 36px;
+            margin-bottom: 10px;
+            font-family: 'Georgia', serif;
+        }
+
+        .gallery-sub {
+            color: #777;
+            margin-bottom: 50px;
+            font-style: italic;
+            font-size: 18px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 35px;
+        }
+
+        .art-card {
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            transition: all 0.4s;
+            border: 1px solid #ece9e2;
+        }
+
+        .art-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+        }
+
+        .img-container {
+            padding: 20px;
+            background-color: #f7f5f0;
+        }
+
+        .art-img {
+            width: 100%;
+            height: 340px;
+            object-fit: cover;
+            border: 14px solid #2c2519;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+        }
+
+        .art-info {
+            padding: 25px;
+            text-align: left;
+        }
+
+        .art-tag {
+            font-size: 13px;
+            color: #b3822a;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .art-title {
+            font-size: 23px;
+            margin-bottom: 10px;
+            color: #111;
+            font-family: 'Georgia', serif;
+        }
+
+        .art-price {
+            font-size: 22px;
+            font-weight: bold;
+            color: #111;
+            margin-bottom: 18px;
+        }
+
+        .buy-btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            background-color: #25D366;
+            color: #fff;
+            padding: 14px;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .buy-btn:hover {
+            background-color: #128C7E;
+            transform: scale(1.03);
+        }
+
+        footer {
+            background-color: #1a150e;
+            color: #ddd;
+            text-align: center;
+            padding: 50px 10%;
+            margin-top: 80px;
+        }
+
+        .footer-social {
+            margin: 20px 0;
+        }
+
+        .footer-social a {
+            color: #ddd;
+            font-size: 24px;
+            margin: 0 15px;
+            transition: color 0.3s;
+        }
+
+        .footer-social a:hover {
+            color: #b3822a;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 38px; }
+            .hero { height: 60vh; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">ART <span>VANGUARD</span></div>
+        <nav>
+            <a href="#">Home</a>
+            <a href="#gallery">Frames Gallery</a>
+            <a href="#">About Us</a>
+            <a href="#">Contact</a>
+            <a href="https://www.instagram.com/Nature_Vanguard" target="_blank" class="social-icon" title="Instagram">📷</a>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <h1>Traditional Art, Elegantly Framed</h1>
+        <p>अपने घर और घर की दीवारों को दीजिए एक क्लासिक और पारंपरिक लुक। हमारे खास ट्रेडिशनल हैंडमेड ऐपन आर्टवर्क्स, जो आते हैं प्रीमियम और मज़बूत फ्रेम्स के साथ.</p>
+        <a href="#gallery" class="btn">Explore Collections</a>
+    </section>
+
+    <section class="gallery-container" id="gallery">
+        <h2>Our Traditional Masterpieces</h2>
+        <p class="gallery-sub">Every artwork comes with a premium protective frame, ready to hang.</p>
+        
+        <div class="grid">
+            <div class="art-card">
+                <div class="img-container">
+                    <img class="art-img" src="art1.jpg.jpeg" alt="The Divine Mandala">
+                </div>
+                <div class="art-info">
+                    <div class="art-tag">Mandala Art • Wooden Frame</div>
+                    <h3 class="art-title">The Divine Mandala</h3>
+                    <p class="art-price">₹1,799 <span>(Including Frame)</span></p>
+                    <a href="https://wa.me/916395207424?text=Hi!%20I%20am%20interested%20in%20ordering%20the%20'The%20Divine%20Mandala'%20art%20frame." target="_blank" class="buy-btn">Order on WhatsApp</a>
+                </div>
+            </div>
+
+            <div class="art-card">
+                <div class="img-container">
+                    <img class="art-img" src="art2.webp.webp" alt="Traditional Heritage">
+                </div>
+                <div class="art-info">
+                    <div class="art-tag">Folk Art • Matte Black Frame</div>
+                    <h3 class="art-title">Traditional Heritage</h3>
+                    <p class="art-price">₹1,999 <span>(Including Frame)</span></p>
+                    <a href="https://wa.me/916395207424?text=Hi!%20I%20am%20interested%20in%20ordering%20the%20'Traditional%20Heritage'%20art%20frame." target="_blank" class="buy-btn">Order on WhatsApp</a>
+                </div>
+            </div>
+
+            <div class="art-card">
+                <div class="img-container">
+                    <img class="art-img" src="art3.webp.webp" alt="Vintage Landscape">
+                </div>
+                <div class="art-info">
+                    <div class="art-tag">Classic Sketch • Golden Border Frame</div>
+                    <h3 class="art-title">Vintage Landscape</h3>
+                    <p class="art-price">₹5,499 <span>(Including Frame)</span></p>
+                    <a href="https://wa.me/916395207424?text=Hi!%20I%20am%20interested%20in%20ordering%20the%20'Vintage%20Landscape'%20art%20frame." target="_blank" class="buy-btn">Order on WhatsApp</a>
+                </div>
+            </div>
+
+            <div class="art-card">
+                <div class="img-container">
+                    <img class="art-img" src="art4.webp.webp" alt="Rajasthani Miniature">
+                </div>
+                <div class="art-info">
+                    <div class="art-tag">Rajasthani Miniature • Golden Frame</div>
+                    <h3 class="art-title">Royal Court Scene</h3>
+                    <p class="art-price">₹1,999 <span>(Including Frame)</span></p>
+                    <a href="https://wa.me/916395207424?text=Hi!%20I%20am%20interested%20in%20ordering%20the%20'Royal%20Court%20Scene'%20art%20frame." target="_blank" class="buy-btn">Order on WhatsApp</a>
+                </div>
+            </div>
+
+            <div class="art-card">
+                <div class="img-container">
+                    <img class="art-img" src="art5.webp.webp" alt="Madhubani Art">
+                </div>
+                <div class="art-info">
+                    <div class="art-tag">Madhubani Folk • Black Frame</div>
+                    <h3 class="art-title">Tree of Life</h3>
+                    <p class="art-price">₹1,999 <span>(Including Frame)</span></p>
+                    <a href="https://wa.me/916395207424?text=Hi!%20I%20am%20interested%20in%20ordering%20the%20'Tree%20of%20Life'%20art%20frame." target="_blank" class="buy-btn">Order on WhatsApp</a>
+                </div>
+            </div>
+
+            <div class="art-card">
+                <div class="img-container">
+                    <img class="art-img" src="art6.webp.webp" alt="Warli Tribal">
+                </div>
+                <div class="art-info">
+                    <div class="art-tag">Warli Tribal • Natural Wood</div>
+                    <h3 class="art-title">Village Celebration</h3>
+                    <p class="art-price">₹1,999 <span>(Including Frame)</span></p>
+                    <a href="https://wa.me/916395207424?text=Hi!%20I%20am%20interested%20in%20ordering%20the%20'Village%20Celebration'%20art%20frame." target="_blank" class="buy-btn">Order on WhatsApp</a>
+                </div>
+            </div>
+
+            <div class="art-card">
+                <div class="img-container">
+                    <img class="art-img" src="art7.webp.jpg" alt="Tanjore Painting">
+                </div>
+                <div class="art-info">
+                    <div class="art-tag">Tanjore Gold Leaf • Ornate Frame</div>
+                    <h3 class="art-title">Lord Krishna</h3>
+                    <p class="art-price">₹2,299 <span>(Including Frame)</span></p>
+                    <a href="https://wa.me/916395207424?text=Hi!%20I%20am%20interested%20in%20ordering%20the%20'Lord%20Krishna'%20art%20frame." target="_blank" class="buy-btn">Order on WhatsApp</a>
+                </div>
+            </div>
+
+            <div class="art-card">
+                <div class="img-container">
+                    <img class="art-img" src="art8.webp.jpeg" alt="Kalamkari Art">
+                </div>
+                <div class="art-info">
+                    <div class="art-tag">Kalamkari • Classic Frame</div>
+                    <h3 class="art-title">Floral Narrative</h3>
+                    <p class="art-price">₹2,199 <span>(Including Frame)</span></p>
+                    <a href="https://wa.me/+916395207424?text=Hi!%20I%20am%20interested%20in%20ordering%20the%20'Floral%20Narrative'%20art%20frame." target="_blank" class="buy-btn">Order on WhatsApp</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 Art Vanguard. All Rights Reserved.</p>
+        <p style="margin-top: 12px; font-size: 13px; color: #b3822a;">Handcrafted with passion and tradition.</p>
+        
+        <div class="footer-social">
+            <a href="https://www.instagram.com/Nature_Vanguard" target="_blank" title="Follow us on Instagram">📷 Instagram</a>
+        </div>
+    </footer>
+
+</body>
+</html>
